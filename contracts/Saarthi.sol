@@ -60,7 +60,7 @@ contract Saarthi {
     address coordinatorAddress = address(0xBeb71662FF9c08aFeF3866f85A6591D4aeBE6e4E);
 
     uint256 nextTaskID = 1;
-    mapping (uint256 => Task) public SentinelTasks;
+    mapping (uint256 => Task) public SaarthiTasks;
     mapping (address => uint256[]) public UserTaskIDs;
 
     event newTaskCreated(uint256 indexed taskID, address indexed _user, string _modelHash, uint256 _amt, uint256 _time);
@@ -88,7 +88,7 @@ contract Saarthi {
             modelHashes: new string[](_rounds)
         });
         newTask.modelHashes[0] = _modelHash;
-        SentinelTasks[nextTaskID] = newTask;
+        SaarthiTasks[nextTaskID] = newTask;
         UserTaskIDs[msg.sender].push(nextTaskID);
         emit newTaskCreated(nextTaskID, msg.sender, _modelHash, taskCost, now);
 
@@ -98,19 +98,19 @@ contract Saarthi {
     function updateModelForTask(uint256 _taskID,  string memory _modelHash, address payable computer) public {
         require(msg.sender == coordinatorAddress, "You are not the coordinator !");
         require(_taskID <= nextTaskID, "Invalid Task ID");
-        uint256 newRound = SentinelTasks[_taskID].currentRound.add(1);
-        require(newRound <= SentinelTasks[_taskID].totalRounds, "All Rounds Completed");
+        uint256 newRound = SaarthiTasks[_taskID].currentRound.add(1);
+        require(newRound <= SaarthiTasks[_taskID].totalRounds, "All Rounds Completed");
 
 
-        SentinelTasks[_taskID].currentRound = newRound;
-        SentinelTasks[_taskID].modelHashes[newRound.sub(1)] = _modelHash;
-        address(computer).transfer(SentinelTasks[_taskID].cost.div(SentinelTasks[_taskID].totalRounds));
+        SaarthiTasks[_taskID].currentRound = newRound;
+        SaarthiTasks[_taskID].modelHashes[newRound.sub(1)] = _modelHash;
+        address(computer).transfer(SaarthiTasks[_taskID].cost.div(SaarthiTasks[_taskID].totalRounds));
         emit modelUpdated(_taskID, _modelHash, now);
 
     }
 
     function getTaskHashes(uint256 _taskID) public view returns (string[] memory) {
-        return (SentinelTasks[_taskID].modelHashes);
+        return (SaarthiTasks[_taskID].modelHashes);
     }
 
     function getTaskCount() public view returns (uint256) {
@@ -174,11 +174,11 @@ contract Saarthi {
     }
 
     mapping (address => User) public Users;
-    uint256 UserCnt = 0;
+    uint256 public UserCnt = 0;
 
-    function addUser(
-        ) public {
+    function addUser() public {
         // already hash a history
+        require(Users[msg.sender].userAddress == address(0x0), "User Already Registered");
 
         string[] memory newRecordHistory;
         address[] memory newAccessors;
@@ -188,7 +188,7 @@ contract Saarthi {
         User memory userTemp = User({
             userAddress: msg.sender,
             accessors: newAccessors,
-            recordHistoryCnt: 1,
+            recordHistoryCnt: 0,
             recordHistory: newRecordHistory,
             billAmount: 0,
             donationCnt: 0,
@@ -239,6 +239,13 @@ contract Saarthi {
         Users[msg.sender].userAddress.transfer(donationAmount);
     }
 
+    function billUser(address _user, uint256 _amt) public payable{
+        require(Users[_user].userAddress != address(0x0), "Invalid User");
+        require(Users[_user].userAddress == msg.sender, "Invalid User");
+
+        Users[msg.sender].billAmount = Users[msg.sender].billAmount.add(_amt);
+    }
+
     struct Report {
         address userAddress;
         string userName;
@@ -247,8 +254,8 @@ contract Saarthi {
         string details;
     }
 
-    Report[] Reports;
-    uint256 reportCnt = 0;
+    Report[] public Reports;
+    uint256 public reportCnt = 0;
 
     function fileReport(string memory _userName, string memory _location, string memory _file, string memory _details) public {
 
@@ -269,6 +276,7 @@ contract Saarthi {
 
     function createCampaign() public {
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
+        require(Users[msg.sender].hasCampaign == false, "User is already Campaigning");
 
         Campaigns.push(msg.sender);
         campaignCnt = campaignCnt.add(1);
