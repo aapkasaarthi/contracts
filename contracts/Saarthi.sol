@@ -171,6 +171,8 @@ contract Saarthi {
         address[] donationAddresses;
         uint256[] donationAmounts;
         bool hasCampaign;
+        string campaignData;
+        bool hasAllowedResearch;
     }
 
     mapping (address => User) public Users;
@@ -184,6 +186,7 @@ contract Saarthi {
         address[] memory newAccessors;
         address[] memory newDonationAddresses;
         uint256[] memory newDonationAmounts;
+        string memory newCampaignData;
 
         User memory userTemp = User({
             userAddress: msg.sender,
@@ -194,7 +197,9 @@ contract Saarthi {
             donationCnt: 0,
             donationAddresses: newDonationAddresses,
             donationAmounts: newDonationAmounts,
-            hasCampaign: false
+            hasCampaign: false,
+            campaignData: newCampaignData,
+            hasAllowedResearch: false
         });
 
         Users[msg.sender] = userTemp;
@@ -204,17 +209,22 @@ contract Saarthi {
 
     function addRecord(string memory _recordHash) public {
         // already hash a history
-        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
+        if(Users[msg.sender].userAddress == address(0x0)){
+            addUser();
+        }
 
         Users[msg.sender].recordHistoryCnt = Users[msg.sender].recordHistoryCnt.add(1);
         Users[msg.sender].recordHistory.push(_recordHash);
     }
 
     function getRecords(address _user) public view returns (string[] memory records){
-        require(Users[_user].userAddress != address(0x0), "Invalid User");
+        if (Users[_user].userAddress == address(0x0)){
+            string[] memory newRecordHistory;
+            return newRecordHistory;
+        }
 
         bool allowed = false;
-        for(uint ind=0;ind<Users[_user].accessors.length;ind+=1){
+        for(uint256 ind=0; ind<Users[_user].accessors.length; ind = ind.add(1)){
             if (Users[_user].accessors[ind] == msg.sender){
                 allowed = true;
                 break;
@@ -225,6 +235,29 @@ contract Saarthi {
 
         return Users[_user].recordHistory;
 
+    }
+
+    function allowAccessToUser(address _address) public {
+        // already hash a history
+        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
+        Users[msg.sender].accessors.push(_address);
+    }
+    function allowAccessToResearch() public {
+        // already hash a history
+        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
+        Users[msg.sender].hasAllowedResearch = true;
+    }
+    function revokeAccessToResearch() public {
+        // already hash a history
+        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
+        Users[msg.sender].hasAllowedResearch = false;
+    }
+
+    function getAccessors() public view returns(address[] memory){
+        // already hash a history
+        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
+
+        return Users[msg.sender].accessors;
     }
 
     function donateToUser(address _user) public payable{
@@ -239,7 +272,7 @@ contract Saarthi {
         Users[msg.sender].userAddress.transfer(donationAmount);
     }
 
-    function billUser(address _user, uint256 _amt) public payable{
+    function billUser(address _user, uint256 _amt) public {
         require(Users[_user].userAddress != address(0x0), "Invalid User");
         require(Users[_user].userAddress == msg.sender, "Invalid User");
 
@@ -274,14 +307,14 @@ contract Saarthi {
     address[] public Campaigns;
     uint256 public campaignCnt = 0;
 
-    function createCampaign() public {
+    function createCampaign(string memory _campaignData) public {
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
         require(Users[msg.sender].hasCampaign == false, "User is already Campaigning");
 
         Campaigns.push(msg.sender);
         campaignCnt = campaignCnt.add(1);
+        Users[msg.sender].campaignData = _campaignData;
         Users[msg.sender].hasCampaign = true;
-
     }
 
 }
