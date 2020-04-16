@@ -237,24 +237,30 @@ contract Saarthi {
         
     }
     
+    function getDonationAmounts(address _user) public view returns (uint256[] memory donationAmounts){
+        require(Users[_user].userAddress != address(0x0), "Invalid User");
+        return Users[_user].donationAmounts;
+    }
+    
+    function getDonationAddresses(address _user) public view returns (address[] memory donationAddresses){
+        require(Users[_user].userAddress != address(0x0), "Invalid User");
+        return Users[_user].donationAddresses;
+    }
+    
     function allowAccessToUser(address _address) public {
-        // already hash a history
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
         Users[msg.sender].accessors.push(_address);
     }
     function allowAccessToResearch() public {
-        // already hash a history
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
         Users[msg.sender].hasAllowedResearch = true;
     }
     function revokeAccessToResearch() public {
-        // already hash a history
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
         Users[msg.sender].hasAllowedResearch = false;
     }
     
     function getAccessors() public view returns(address[] memory){
-        // already hash a history
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
         
         return Users[msg.sender].accessors;
@@ -272,11 +278,33 @@ contract Saarthi {
         Users[msg.sender].userAddress.transfer(donationAmount);
     }
     
-    function billUser(address _user, uint256 _amt) public {
-        require(Users[_user].userAddress != address(0x0), "Invalid User");
-        require(Users[_user].userAddress == msg.sender, "Invalid User");
+    function billUser(uint256 _amt) public {
+        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
 
         Users[msg.sender].billAmount = Users[msg.sender].billAmount.add(_amt);
+    }
+    
+    address[] public Campaigns;
+    mapping (address => uint256) internal CampaignsToIndex;
+    uint256 public campaignCnt = 0;
+    
+    function createCampaign(string memory _campaignData) public {
+        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
+        require(Users[msg.sender].hasCampaign == false, "User is already Campaigning");
+        
+        Campaigns.push(msg.sender);
+        CampaignsToIndex[msg.sender] = campaignCnt;
+        campaignCnt = campaignCnt.add(1);
+        Users[msg.sender].campaignData = _campaignData;
+        Users[msg.sender].hasCampaign = true;
+    }
+    
+    function stopCampaign() public {
+        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
+        require(Users[msg.sender].hasCampaign == true, "User is already Campaigning");
+        
+        Users[msg.sender].hasCampaign = false;
+        delete Campaigns[CampaignsToIndex[msg.sender]];
     }
     
     struct Report {
@@ -304,17 +332,6 @@ contract Saarthi {
 
     }
     
-    address[] public Campaigns;
-    uint256 public campaignCnt = 0;
     
-    function createCampaign(string memory _campaignData) public {
-        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
-        require(Users[msg.sender].hasCampaign == false, "User is already Campaigning");
-        
-        Campaigns.push(msg.sender);
-        campaignCnt = campaignCnt.add(1);
-        Users[msg.sender].campaignData = _campaignData;
-        Users[msg.sender].hasCampaign = true;
-    }
 
 }
