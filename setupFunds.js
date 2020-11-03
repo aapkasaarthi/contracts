@@ -12,7 +12,7 @@ var args = process.argv;
 console.log(`Setting up on ${args[2]}.`)
 
 if (args[2] == 'rsktestnet'){
-    let rsktestnet_provider = new HDWalletProvider(mnemonic, 'https://public-node.testnet.rsk.co/2.0.1/');
+    let rsktestnet_provider = new HDWalletProvider(mnemonic, 'https://public-node.testnet.rsk.co/');
     web3 = new Web3(rsktestnet_provider);
     networkId = 31;
     gas = 6800000

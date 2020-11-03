@@ -19,9 +19,9 @@ module.exports = {
       gasPrice: '1000000000' // 1 gwei
     },
     rsktestnet: {
-      provider: () => new HDWalletProvider(mnemonic, 'https://public-node.testnet.rsk.co/2.0.1/'),
+      provider: () => new HDWalletProvider(mnemonic, 'https://public-node.testnet.rsk.co'),
       network_id: 31,
-      confirmations: 1,
+      confirmations: 0,
       timeoutBlocks: 200,
       skipDryRun: true,
       gas: 6800000,

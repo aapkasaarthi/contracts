@@ -76,6 +76,9 @@ contract Saarthi {
     event newTaskCreated(uint256 indexed taskID, address indexed _user, string _modelHash, uint256 _amt, uint256 _time);
     event modelUpdated(uint256 indexed taskID, string _modelHash, uint256 _time);
 
+    event donatationToFund(uint256 indexed fund_id, address indexed sender, address indexed receiver, uint256 amount);
+    event donatationToCampaign(address indexed sender, address indexed receiver, uint256 amount);
+
     constructor() {
         owner = msg.sender;
     }
@@ -169,6 +172,7 @@ contract Saarthi {
         totalDonationCnt = totalDonationCnt.add(1);
 
         Funds[_fundID].fundAddress.transfer(msg.value);
+        emit donatationToFund(_fundID, msg.sender, Funds[_fundID].fundAddress, msg.value);
     }
 
     struct User {
@@ -286,6 +290,7 @@ contract Saarthi {
         Users[msg.sender].donationAmounts.push(donationAmount);
 
         Users[msg.sender].userAddress.transfer(donationAmount);
+        emit donatationToCampaign(msg.sender, Users[msg.sender].userAddress, donationAmount);
     }
 
     function billUser(uint256 _amt) public {
