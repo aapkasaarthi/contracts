@@ -2,7 +2,7 @@ name: Truffle Tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [ consensys ]
   pull_request:
 
 jobs:
