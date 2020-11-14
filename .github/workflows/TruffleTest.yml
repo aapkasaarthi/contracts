@@ -22,9 +22,14 @@ jobs:
 
     - name: Setup Node.js
       uses: actions/setup-node@v1.4.4
+        with:
+          node-version: '14'
 
     - name: Install Truffle
       run: npm install -g truffle@5.1.53
+
+    - name: Install Dependencies
+      run: npm i
 
     - name: Run Truffle Tests
       run: truffle test
