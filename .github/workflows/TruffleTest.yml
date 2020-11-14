@@ -35,7 +35,7 @@ jobs:
       run: npm i
 
     - name: Run Ganache
-      run: ganache-cli
+      run: ganache-cli &
 
     - name: Run Truffle Tests
       run: truffle test
