@@ -4,7 +4,14 @@
   "description": "",
   "main": "truffle-config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "truffle test",
+    "deploy": "npm run deploy:ropsten && npm run deploy:rinkeby && npm run deploy:kovan && npm run deploy:goerli && npm run deploy:mumbai && npm run deploy:rsktestnet",
+    "deploy:ropsten": "truffle migrate --network ropsten",
+    "deploy:rinkeby": "truffle migrate --network rinkeby",
+    "deploy:kovan": "truffle migrate --network kovan",
+    "deploy:goerli": "truffle migrate --network goerli",
+    "deploy:mumbai": "truffle migrate --network mumbai",
+    "deploy:rsktestnet": "truffle migrate --network rsktestnet",
     "setup": "node setupFunds.js rsktestnet"
   },
   "repository": {
@@ -18,7 +25,8 @@
   },
   "homepage": "https://github.com/aapkasaarthi/contracts#readme",
   "dependencies": {
-    "@truffle/hdwallet-provider": "^1.1.1",
-    "web3": "^1.3.0"
+    "node-fetch": ">=2.6.1",
+    "@truffle/hdwallet-provider": ">=1.2.0",
+    "web3": ">=1.3.0"
   }
 }

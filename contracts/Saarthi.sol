@@ -54,6 +54,10 @@ library SafeMath {
 
 }
 
+
+/// @title Primary Saarthi Contract
+/// @author Anudit Nagar
+/// @dev All function calls are currently implemented without side effects
 contract Saarthi {
 
     using SafeMath for uint256;
@@ -68,6 +72,7 @@ contract Saarthi {
 
     address owner;
     address coordinatorAddress = address(0xBeb71662FF9c08aFeF3866f85A6591D4aeBE6e4E);
+    bool public paused = false;
 
     uint256 nextTaskID = 1;
     mapping (uint256 => Task) public SaarthiTasks;
@@ -83,12 +88,30 @@ contract Saarthi {
         owner = msg.sender;
     }
 
+    modifier notPaused {
+        require(
+            paused == false,
+            "Contract is Paused"
+        );
+        _;
+    }
+
+    /// @notice Updates the Owner of the Contract
     function updateOwner(address _newOwner) public {
         require(msg.sender == owner, "Only Owner");
         owner = _newOwner;
     }
 
-    function createTask(string memory _modelHash, uint256 _rounds) public payable {
+    /// @notice Pause the contract in case of emergency.
+    function togglePause() public{
+        require(msg.sender == owner, "Only Owner");
+        paused = !paused;
+    }
+
+    /// @notice Create a new task for decentralized computation.
+    /// @param _modelHash IPFS Hash of the Model.
+    /// @param _rounds total number of training rounds.
+    function createTask(string memory _modelHash, uint256 _rounds) public payable notPaused {
         require(_rounds < 10, "Number of Rounds should be less than 10");
         uint256 taskCost = msg.value;
 
@@ -108,7 +131,11 @@ contract Saarthi {
         nextTaskID = nextTaskID.add(1);
     }
 
-    function updateModelForTask(uint256 _taskID,  string memory _modelHash, address payable computer) public {
+    /// @notice Create a new task for decentralized computation.
+    /// @param _taskID Id of the task.
+    /// @param _modelHash IPFS Hash of the Model.
+    /// @param computer address of the model computer.
+    function updateModelForTask(uint256 _taskID,  string memory _modelHash, address payable computer) public notPaused {
         require(msg.sender == coordinatorAddress, "You are not the coordinator !");
         require(_taskID <= nextTaskID, "Invalid Task ID");
         uint256 newRound = SaarthiTasks[_taskID].currentRound.add(1);
@@ -126,9 +153,15 @@ contract Saarthi {
     //     return (SaarthiTasks[_taskID].modelHashes);
     // }
 
+
+    /// @notice Get the count of all the tasks in the network.
+    /// @return count
     function getTaskCount() public view returns (uint256) {
         return nextTaskID.sub(1);
     }
+
+    /// @notice Get the task IDs of a user.
+    /// @return task IDs of the user.
     function getTasksOfUser() public view returns (uint256[] memory) {
         return UserTaskIDs[msg.sender];
     }
@@ -147,7 +180,11 @@ contract Saarthi {
     uint256 public totalDonationCnt = 0;
     mapping (uint256 => Fund) public Funds;
 
-    function createFund(string memory _orgName,string memory _fundName, address payable _orgAdress) public {
+    /// @notice Create a new fund for donation.
+    /// @param _orgName Organization name.
+    /// @param _fundName Name of the fund.
+    /// @param _orgAdress address of the Organization.
+    function createFund(string memory _orgName,string memory _fundName, address payable _orgAdress) public notPaused {
         Fund memory newfund;
         newfund = Fund({
             orgID: fundCnt,
@@ -162,7 +199,9 @@ contract Saarthi {
         fundCnt = fundCnt.add(1);
     }
 
-    function donateToFund(uint256 _fundID) public payable{
+    /// @notice Donate to a Fund of choice.
+    /// @param _fundID ID of the Fund.
+    function donateToFund(uint256 _fundID) public payable notPaused{
         require(_fundID <= fundCnt, "Invalid Fund ID");
 
         Funds[_fundID].donationAmount = Funds[_fundID].donationAmount.add(msg.value);
@@ -192,7 +231,9 @@ contract Saarthi {
     mapping (address => User) public Users;
     uint256 public UserCnt = 0;
 
-    function addUser() public {
+
+    /// @notice Add a new user to the network.
+    function addUser() public notPaused {
         // already hash a history
         require(Users[msg.sender].userAddress == address(0x0), "User Already Registered");
 
@@ -221,8 +262,10 @@ contract Saarthi {
 
     }
 
-    function addRecord(string memory _recordHash) public {
-        // already hash a history
+    /// @notice Add a new IPFS storage record for the user.
+    /// @param _recordHash IPFS hash of the record.
+    function addRecord(string memory _recordHash) public notPaused {
+        // already has a history
         if(Users[msg.sender].userAddress == address(0x0)){
             addUser();
         }
@@ -231,6 +274,9 @@ contract Saarthi {
         Users[msg.sender].recordHistory.push(_recordHash);
     }
 
+    /// @notice Get the records of the user.
+    /// @param _user address of the user.
+    /// @param _index index location.
     function getRecord(address _user, uint _index) public view returns (string memory records){
         if (Users[_user].userAddress == address(0x0)){
             string memory newRecordHistory;
@@ -251,36 +297,49 @@ contract Saarthi {
 
     }
 
+    /// @notice Get the donation amounts of the user.
+    /// @param _user Address of the user.
     function getDonationAmounts(address _user) public view returns (uint256[] memory donationAmounts){
         require(Users[_user].userAddress != address(0x0), "Invalid User");
         return Users[_user].donationAmounts;
     }
 
+    /// @notice Get donation addresses of the user.
+    /// @param _user Address of the user.
     function getDonationAddresses(address _user) public view returns (address[] memory donationAddresses){
         require(Users[_user].userAddress != address(0x0), "Invalid User");
         return Users[_user].donationAddresses;
     }
 
+    /// @notice Allow access of the records of a user to a new user.
+    /// @param _address address of the user user.
     function allowAccessToUser(address _address) public {
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
         Users[msg.sender].accessors.push(_address);
     }
+
+    /// @notice Allow access of the records to a predefined research address.
     function allowAccessToResearch() public {
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
         Users[msg.sender].hasAllowedResearch = true;
     }
+
+    /// @notice Revoke research accesss.
     function revokeAccessToResearch() public {
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
         Users[msg.sender].hasAllowedResearch = false;
     }
 
+    /// @notice get a list of authorized accessors.
+    /// @return list of accesssors authorized.
     function getAccessors() public view returns(address[] memory){
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
-
         return Users[msg.sender].accessors;
     }
 
-    function donateToUser(address _user) public payable{
+    /// @notice Donate to a User Campaign.
+    /// @param _user Address of the Donation Receiver.
+    function donateToUser(address _user) public payable notPaused{
         require(Users[_user].userAddress != address(0x0), "Invalid User");
 
         uint256 donationAmount = msg.value;
@@ -293,9 +352,10 @@ contract Saarthi {
         emit donatationToCampaign(msg.sender, Users[msg.sender].userAddress, donationAmount);
     }
 
-    function billUser(uint256 _amt) public {
+    /// @notice Bill a user of medical expenses.
+    /// @param _amt  Amount to bill.
+    function billUser(uint256 _amt) public notPaused {
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
-
         Users[msg.sender].billAmount = Users[msg.sender].billAmount.add(_amt);
     }
 
@@ -303,7 +363,9 @@ contract Saarthi {
     mapping (address => uint256) internal CampaignsToIndex;
     uint256 public campaignCnt = 0;
 
-    function createCampaign(string memory _campaignData) public {
+    /// @notice Create a new user campaign for donation.
+    /// @param _campaignData details about a campaign.
+    function createCampaign(string memory _campaignData) public notPaused {
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
         require(Users[msg.sender].hasCampaign == false, "User is already Campaigning");
 
@@ -314,7 +376,8 @@ contract Saarthi {
         Users[msg.sender].hasCampaign = true;
     }
 
-    function stopCampaign() public {
+    /// @notice Stop a campaign
+    function stopCampaign() public notPaused {
         require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
         require(Users[msg.sender].hasCampaign == true, "User is already Campaigning");
 
@@ -333,7 +396,12 @@ contract Saarthi {
     Report[] public Reports;
     uint256 public reportCnt = 0;
 
-    function fileReport(string memory _userName, string memory _location, string memory _file, string memory _details) public {
+    /// @notice Create an anonymous report.
+    /// @param _userName name of the reporter.
+    /// @param _location lcoation of the report.
+    /// @param _file IPFS hash of the report.
+    /// @param _details AAdditional details about the report.
+    function fileReport(string memory _userName, string memory _location, string memory _file, string memory _details) public notPaused {
 
         Report memory tempreport = Report({
             userAddress:msg.sender,
@@ -346,7 +414,6 @@ contract Saarthi {
         reportCnt = reportCnt.add(1);
 
     }
-
 
 
 }
