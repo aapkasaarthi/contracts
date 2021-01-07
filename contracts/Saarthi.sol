@@ -7,9 +7,8 @@
 
 */
 
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.8.0 <0.9.0;
-// pragma experimental ABIEncoderV2;
 
 library SafeMath {
 
@@ -81,8 +80,6 @@ contract Saarthi {
     event newTaskCreated(uint256 indexed taskID, address indexed _user, string _modelHash, uint256 _amt, uint256 _time);
     event modelUpdated(uint256 indexed taskID, string _modelHash, uint256 _time);
 
-    event donatationToCampaign(address indexed sender, address indexed receiver, uint256 amount);
-
     constructor() {
         owner = msg.sender;
     }
@@ -102,7 +99,7 @@ contract Saarthi {
     }
 
     /// @notice Pause the contract in case of emergency.
-    function togglePause() public{
+    function togglePause() public {
         require(msg.sender == owner, "Only Owner");
         paused = !paused;
     }
@@ -167,16 +164,7 @@ contract Saarthi {
 
     struct User {
         address payable userAddress;
-        address[] accessors;
-        uint256 recordHistoryCnt;
-        string[] recordHistory;
         uint256 billAmount;
-        uint256 donationCnt;
-        address[] donationAddresses;
-        uint256[] donationAmounts;
-        bool hasCampaign;
-        string campaignData;
-        bool hasAllowedResearch;
     }
 
     mapping (address => User) public Users;
@@ -185,33 +173,20 @@ contract Saarthi {
 
     /// @notice Add a new user to the network.
     function addUser() public notPaused {
-        // already hash a history
+        // already has a history
         require(Users[msg.sender].userAddress == address(0x0), "User Already Registered");
-
-        string[] memory newRecordHistory;
-        address[] memory newAccessors;
-        address[] memory newDonationAddresses;
-        uint256[] memory newDonationAmounts;
-        string memory newCampaignData;
 
         User memory userTemp = User({
             userAddress: payable(msg.sender),
-            accessors: newAccessors,
-            recordHistoryCnt: 0,
-            recordHistory: newRecordHistory,
-            billAmount: 0,
-            donationCnt: 0,
-            donationAddresses: newDonationAddresses,
-            donationAmounts: newDonationAmounts,
-            hasCampaign: false,
-            campaignData: newCampaignData,
-            hasAllowedResearch: false
+            billAmount: 0
         });
 
         Users[msg.sender] = userTemp;
         UserCnt = UserCnt.add(1);
 
     }
+
+
 
     /// @notice Bill a user of medical expenses.
     /// @param _amt  Amount to bill.
@@ -220,120 +195,53 @@ contract Saarthi {
         Users[msg.sender].billAmount = Users[msg.sender].billAmount.add(_amt);
     }
 
-    /// @notice Add a new IPFS storage record for the user.
-    /// @param _recordHash IPFS hash of the record.
-    function addRecord(string memory _recordHash) public notPaused {
-        // already has a history
-        if(Users[msg.sender].userAddress == address(0x0)){
-            addUser();
-        }
+    //------------------------------
+    // Acccess Handlers
+    //------------------------------
 
-        Users[msg.sender].recordHistoryCnt = Users[msg.sender].recordHistoryCnt.add(1);
-        Users[msg.sender].recordHistory.push(_recordHash);
+    mapping (address => mapping (address => bool)) public approval; // from -> to
+    event newApproval(address indexed _from, address indexed _to, bool _finalState);
+
+    /// @notice Toggle access to records to a user.
+    /// @param _address address of the user.
+    function toggleAccessToAddress(address _address) public {
+        approval[msg.sender][_address] = !approval[msg.sender][_address];
+        emit newApproval(msg.sender, _address, approval[msg.sender][_address]);
     }
 
-    /// @notice Get the records of the user.
-    /// @param _user address of the user.
-    /// @param _index index location.
-    function getRecord(address _user, uint _index) public view returns (string memory records){
-        if (Users[_user].userAddress == address(0x0)){
-            string memory newRecordHistory;
-            return newRecordHistory;
-        }
-
-        bool allowed = false;
-        for(uint256 ind=0; ind<Users[_user].accessors.length; ind = ind.add(1)){
-            if (Users[_user].accessors[ind] == msg.sender){
-                allowed = true;
-                break;
-            }
-        }
-
-        require( (Users[_user].userAddress == msg.sender) || allowed == true, "Cannot Access Records");
-
-        return Users[_user].recordHistory[_index];
-
-    }
-
-    /// @notice Get the donation amounts of the user.
-    /// @param _user Address of the user.
-    function getDonationAmounts(address _user) public view returns (uint256[] memory donationAmounts){
-        require(Users[_user].userAddress != address(0x0), "Invalid User");
-        return Users[_user].donationAmounts;
-    }
-
-    /// @notice Get donation addresses of the user.
-    /// @param _user Address of the user.
-    function getDonationAddresses(address _user) public view returns (address[] memory donationAddresses){
-        require(Users[_user].userAddress != address(0x0), "Invalid User");
-        return Users[_user].donationAddresses;
-    }
-
-    /// @notice Allow access of the records of a user to a new user.
-    /// @param _address address of the user user.
-    function allowAccessToUser(address _address) public {
-        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
-        Users[msg.sender].accessors.push(_address);
-    }
-
-    /// @notice Allow access of the records to a predefined research address.
-    function allowAccessToResearch() public {
-        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
-        Users[msg.sender].hasAllowedResearch = true;
-    }
-
-    /// @notice Revoke research accesss.
-    function revokeAccessToResearch() public {
-        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
-        Users[msg.sender].hasAllowedResearch = false;
-    }
-
-    /// @notice get a list of authorized accessors.
-    /// @return list of accesssors authorized.
-    function getAccessors() public view returns(address[] memory){
-        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
-        return Users[msg.sender].accessors;
-    }
-
-    /// @notice Donate to a User Campaign.
-    /// @param _user Address of the Donation Receiver.
-    function donateToUser(address _user) public payable notPaused{
-        require(Users[_user].userAddress != address(0x0), "Invalid User");
-
-        uint256 donationAmount = msg.value;
-
-        Users[_user].donationCnt = Users[_user].donationCnt.add(1);
-        Users[msg.sender].donationAddresses.push(msg.sender);
-        Users[msg.sender].donationAmounts.push(donationAmount);
-
-        Users[msg.sender].userAddress.transfer(donationAmount);
-        emit donatationToCampaign(msg.sender, Users[msg.sender].userAddress, donationAmount);
-    }
+    //------------------------------
+    // Public Campaigns
+    //------------------------------
 
     address[] public Campaigns;
-    mapping (address => uint256) internal CampaignsToIndex;
-    uint256 public campaignCnt = 0;
+    uint256 public activeCampaignCnt = 0;
+    mapping (address => bool) public campaignEnabled;
+
+    event newCampaign(address indexed _campaigner, bytes32 _campaignData, uint256 _createdAt);
+    event newCampaignDonation(address indexed _campaigner,address indexed _from, uint256 amount);
 
     /// @notice Create a new user campaign for donation.
-    /// @param _campaignData details about a campaign.
-    function createCampaign(string memory _campaignData) public notPaused {
-        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
-        require(Users[msg.sender].hasCampaign == false, "User is already Campaigning");
+    /// @param _campaignData IPFS hash of the details about a campaign.
+    function startCampaign(bytes32 _campaignData) public notPaused {
+        if (campaignEnabled[msg.sender] == false){
+            campaignEnabled[msg.sender] = true;
+            activeCampaignCnt = activeCampaignCnt + 1;
+        }
+        emit newCampaign(msg.sender, _campaignData, block.timestamp);
+    }
 
-        Campaigns.push(msg.sender);
-        CampaignsToIndex[msg.sender] = campaignCnt;
-        campaignCnt = campaignCnt.add(1);
-        Users[msg.sender].campaignData = _campaignData;
-        Users[msg.sender].hasCampaign = true;
+    /// @notice Donate to a Campaign.
+    /// @param _user Address of the Donation Receiver.
+    function donateToCampaign(address _user) public payable notPaused {
+        require(campaignEnabled[_user] == true, "User is not Campaigning");
+        Users[msg.sender].userAddress.transfer(msg.value);
+        emit newCampaignDonation(_user, msg.sender, msg.value);
     }
 
     /// @notice Stop a campaign
     function stopCampaign() public notPaused {
-        require(Users[msg.sender].userAddress != address(0x0), "Invalid User");
-        require(Users[msg.sender].hasCampaign == true, "User is already Campaigning");
-
-        Users[msg.sender].hasCampaign = false;
-        delete Campaigns[CampaignsToIndex[msg.sender]];
+        require(campaignEnabled[msg.sender] == true, "User is not Campaigning");
+        campaignEnabled[msg.sender] = false;
     }
 
     //------------------------------

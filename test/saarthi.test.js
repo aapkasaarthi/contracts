@@ -92,9 +92,48 @@ describe("Saarthi", accounts => {
 
     });
 
-    describe("Reports", accounts => {
+    describe("Campaigning", accounts => {
 
-        it("should create a report", async() =>{
+        it("Should create a campaign", async() => {
+            await saarthi.connect(addr1).startCampaign(getBytes32FromIpfsHash('QmR3VgpgJcGJZX4iazxBcvn2G7jHktLCdozaWF6Hp8DLLH'));
+            expect(await saarthi.campaignEnabled(
+                addr1.getAddress()
+            )).to.equal(true);
+        })
+
+        it("should donate to a campaign", async() =>{
+            await saarthi.connect(addr1).startCampaign(getBytes32FromIpfsHash('QmR3VgpgJcGJZX4iazxBcvn2G7jHktLCdozaWF6Hp8DLLH'));
+            expect(await saarthi.campaignEnabled(
+                addr1.getAddress()
+            )).to.equal(true);
+
+            await saarthi.connect(owner).donateToCampaign(
+                addr1.getAddress(),
+                {value: ethers.utils.parseEther('1')}
+            );
+
+            expect(await saarthi.connect(addr1).campaignEnabled(
+                addr1.getAddress()
+            )).to.equal(true);
+        })
+
+        it("should stop campaign", async() =>{
+            await saarthi.connect(addr1).startCampaign(getBytes32FromIpfsHash('QmR3VgpgJcGJZX4iazxBcvn2G7jHktLCdozaWF6Hp8DLLH'));
+            expect(await saarthi.campaignEnabled(
+                addr1.getAddress()
+            )).to.equal(true);
+
+            await saarthi.connect(addr1).stopCampaign();
+            expect(await saarthi.campaignEnabled(
+                addr1.getAddress()
+            )).to.equal(false);
+        })
+
+    });
+
+    describe("Anonymous Reporting", accounts => {
+
+        it("Should create a report", async() =>{
 
             await saarthi.fileReport(
                 ethers.utils.formatBytes32String('37.4221 N, 122.0841 W'),
@@ -106,59 +145,22 @@ describe("Saarthi", accounts => {
 
     });
 
+    describe("Access Handlers", accounts => {
 
+        it("Should allow research access", async() =>{
+            expect(await saarthi.approval(owner.getAddress(), addr1.getAddress())).to.equal(false);
+            await saarthi.toggleAccessToAddress(addr1.getAddress());
+            expect(await saarthi.approval(owner.getAddress(), addr1.getAddress())).to.equal(true);
+        })
 
-      /*
+        it("Should revoke research access", async() =>{
+            await saarthi.toggleAccessToAddress(addr1.getAddress());
+            expect(await saarthi.approval(owner.getAddress(), addr1.getAddress())).to.equal(true);
 
+            await saarthi.toggleAccessToAddress(addr1.getAddress());
+            expect(await saarthi.approval(owner.getAddress(), addr1.getAddress())).to.equal(false);
+        })
 
-    it("should register user", async() =>{
-        await instance.addUser({from: owner})
-        let uc = await instance.UserCnt({from: owner})
-        assert.equal(uc.toString(), '1')
-    })
-
-    it("should create a Campaign", async() =>{
-        await instance.addUser({from: owner})
-        await instance.createCampaign('New campaign', {from: owner})
-        let ud = await instance.Users(owner, {from: owner})
-        assert.equal(ud.hasCampaign, true)
-    })
-
-    it("should donate to a campaign", async() =>{
-        await instance.addUser({from: owner})
-        await instance.createCampaign('New campaign', {from: owner})
-        await instance.donateToUser(owner, {from: owner, value:web3.utils.toWei('1', 'ether')})
-        let ud = await instance.Users(owner, {from: owner})
-        assert.equal(ud.donationCnt.toString(), '1')
-    })
-
-    it("should stop campaign", async() =>{
-        await instance.addUser({from: owner})
-        await instance.createCampaign('New campaign', {from: owner})
-        await instance.stopCampaign({from: owner})
-        let ud = await instance.Users(owner, {from: owner})
-        assert.equal(ud.hasCampaign, false)
-    })
-
-    it("should create a report", async() =>{
-        await instance.addUser({from: owner})
-        await instance.fileReport(
-            'Anonymous',
-            'Location',
-            'Qm2m2',
-            'Anonym Report',
-        {from: owner})
-        let rc = await instance.reportCnt({from: owner})
-        assert.equal(rc.toString(), '1')
-    })
-
-    it("should store a file", async() =>{
-        await instance.addUser({from: owner})
-        await instance.addRecord('Qm2m2',{from: owner})
-        let ud = await instance.Users(owner, {from: owner})
-        assert.equal(ud.recordHistoryCnt.toString(), '1')
-    })
-
-    */
+    });
 });
 

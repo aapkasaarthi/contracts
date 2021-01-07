@@ -18,7 +18,7 @@ module.exports = {
     version: "0.8.0",
     settings: {
       optimizer: {
-        runs: 99999,
+        runs: 999999,
         enabled: true
       }
     }
