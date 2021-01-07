@@ -6,6 +6,7 @@
     "compile": "npx hardhat compile",
     "deployLocal": "npx hardhat run scripts/deploy.js --network hardhat",
     "deployProd": "npx hardhat run scripts/deploy.js --network mumbai",
+    "coverage": "npx hardhat coverage --testfiles 'test/*.js'",
     "test": "npx hardhat test",
     "setup": "node setupFunds.js rsktestnet"
   },
@@ -27,7 +28,8 @@
     "ethereum-waffle": "^3.2.1",
     "ethers": "^5.0.24",
     "hardhat": "^2.0.6",
-    "hardhat-gas-reporter": "^1.0.4"
+    "hardhat-gas-reporter": "^1.0.4",
+    "solidity-coverage": "^0.7.13"
   },
   "dependencies": {
     "dotenv": "^8.2.0"

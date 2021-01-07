@@ -1,5 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
 require("hardhat-gas-reporter");
+require("solidity-coverage");
 require('dotenv').config()
 
 let mnemonic = process.env.MNEMONIC;

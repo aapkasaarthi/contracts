@@ -2,14 +2,14 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Users\\anudit\\Documents\\GitHub\\saarthi-contracts\\contracts\\Saarthi.sol": {
-      "lastModificationDate": 1610043975503,
-      "contentHash": "d33452016f140da5334ca3a845c9121f",
+      "lastModificationDate": 1610044408755,
+      "contentHash": "c78e270b343e5c31a81565dd7e59969e",
       "sourceName": "contracts/Saarthi.sol",
       "solcConfig": {
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": true,
+            "enabled": false,
             "runs": 999999
           },
           "outputSelection": {
@@ -24,6 +24,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
