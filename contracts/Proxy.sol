@@ -12,9 +12,10 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import './SaarthiStorage.sol';
 
-contract Registry is SaarthiStorage {
+contract Proxy is SaarthiStorage {
 
     address public owner;
+    address public implementation;
 
     constructor() {
         owner = msg.sender;
@@ -25,19 +26,24 @@ contract Registry is SaarthiStorage {
         _;
     }
 
-    address public logic_contract;
-
     // admin to set contract
-    function setLogicContract(address _c) public onlyOwner returns (bool success){
-        logic_contract = _c;
+    function upgradeTo(address _c) public onlyOwner returns (bool success){
+        implementation = _c;
         version = version + 1;
         return true;
     }
 
-    // fallback function
     fallback() payable external {
+        _handle();
+    }
 
-        address target = logic_contract;
+    receive() payable external {
+        _handle();
+    }
+
+    function _handle() payable public {
+
+        address target = implementation;
 
         assembly {
             // Copy the data sent to the memory address starting free mem position
@@ -56,10 +62,7 @@ contract Registry is SaarthiStorage {
             case 0 { revert(ptr, size) }
             default { return(ptr, size) }
         }
-    }
 
-    receive() external payable {
-        // custom function code
     }
 
 }

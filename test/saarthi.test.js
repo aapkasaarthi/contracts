@@ -14,7 +14,7 @@ function getIpfsHashFromBytes32(bytes32Hex) {
 
 describe("Saarthi", accounts => {
 
-    let registry;
+    let proxy;
     let saarthi;
     let owner;
     let addr1;
@@ -24,15 +24,15 @@ describe("Saarthi", accounts => {
     beforeEach(async function () {
         [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
 
-        const Registry = await ethers.getContractFactory("Registry");
-        registry = await Registry.deploy();
+        const Proxy = await ethers.getContractFactory("Proxy");
+        proxy = await Proxy.deploy();
 
         const Saarthi = await ethers.getContractFactory("Saarthi");
         const logic = await Saarthi.deploy();
 
-        await registry.setLogicContract(logic.address);
+        await proxy.upgradeTo(logic.address);
 
-        saarthi = Saarthi.attach(registry.address);
+        saarthi = Saarthi.attach(proxy.address);
 
         await saarthi.initialize();
     });
@@ -241,7 +241,7 @@ describe("Saarthi", accounts => {
             const logic = await Saarthi.deploy();
 
             // Connect new logic
-            await registry.setLogicContract(logic.address);
+            await proxy.upgradeTo(logic.address);
 
             // check if version got updated
             expect(await saarthi.version()).to.equal(2);

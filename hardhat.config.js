@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
 require('dotenv').config()
@@ -43,6 +44,9 @@ module.exports = {
       chainId: 97,
       accounts: mnemonic ? { mnemonic } : undefined
     }
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY ? process.env.ETHERSCAN_API_KEY : undefined
   },
   gasReporter: {
     currency: 'USD',
