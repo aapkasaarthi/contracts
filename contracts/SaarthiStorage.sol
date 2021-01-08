@@ -4,7 +4,7 @@
   \__ \/ __ `/ __ `/ ___/ __/ __ \/ /
  ___/ / /_/ / /_/ / /  / /_/ / / / /
 /____/\__,_/\__,_/_/   \__/_/ /_/_/
-
+       Saarthi Storage Layer
 */
 
 // SPDX-License-Identifier: GPL-3.0
@@ -16,9 +16,13 @@ pragma solidity >=0.8.0 <0.9.0;
 /// @dev All function calls are currently implemented.
 contract SaarthiStorage {
 
-    address public owner;
+    uint256 public version = 0;
+
+    address public admin;
+    bool initialized;
+
     address public coordinatorAddress;
-    bool public paused = false;
+    bool public paused;
 
     //------------------------------
     // Task Coordinator

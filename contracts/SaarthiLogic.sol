@@ -4,7 +4,7 @@
   \__ \/ __ `/ __ `/ ___/ __/ __ \/ /
  ___/ / /_/ / /_/ / /  / /_/ / / / /
 /____/\__,_/\__,_/_/   \__/_/ /_/_/
-
+       Saarthi Logic Layer v1
 */
 
 // SPDX-License-Identifier: GPL-3.0
@@ -17,8 +17,10 @@ import './SaarthiStorage.sol';
 /// @dev All function calls are currently implemented.
 contract Saarthi is SaarthiStorage {
 
-    constructor() {
-        owner = msg.sender;
+    function initialize() external {
+        require(initialized == false, "Already Initialized");
+        initialized = true;
+        admin = msg.sender;
         coordinatorAddress = msg.sender;
     }
 
@@ -30,15 +32,15 @@ contract Saarthi is SaarthiStorage {
         _;
     }
 
-    /// @notice Updates the Owner of the Contract
-    function updateOwner(address _newOwner) public {
-        require(msg.sender == owner, "Only Owner");
-        owner = _newOwner;
+    /// @notice Updates the Admin of the Contract
+    function updateAdmin(address _newAdmin) public {
+        require(msg.sender == admin, "Only Admin");
+        admin = _newAdmin;
     }
 
     /// @notice Pause the contract in case of emergency.
     function togglePause() public {
-        require(msg.sender == owner, "Only Owner");
+        require(msg.sender == admin, "Only Admin");
         paused = !paused;
     }
 
@@ -92,7 +94,7 @@ contract Saarthi is SaarthiStorage {
     /// @notice Toggle Hospital Access.
     /// @param _address  Address of Hospital.
     function toggleHospital(address _address) public notPaused {
-        require(msg.sender == owner, "Only Owner");
+        require(msg.sender == admin, "Only Admin");
         hospitals[_address] = !hospitals[_address];
     }
 

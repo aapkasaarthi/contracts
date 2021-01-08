@@ -12,10 +12,9 @@ function getIpfsHashFromBytes32(bytes32Hex) {
   return hashStr
 }
 
-
-
 describe("Saarthi", accounts => {
 
+    let registry;
     let saarthi;
     let owner;
     let addr1;
@@ -23,9 +22,19 @@ describe("Saarthi", accounts => {
     let addrs;
 
     beforeEach(async function () {
-        const Saarthi = await ethers.getContractFactory("Saarthi");
-        saarthi = await Saarthi.deploy();
         [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
+
+        const Registry = await ethers.getContractFactory("Registry");
+        registry = await Registry.deploy();
+
+        const Saarthi = await ethers.getContractFactory("Saarthi");
+        const logic = await Saarthi.deploy();
+
+        await registry.setLogicContract(logic.address);
+
+        saarthi = Saarthi.attach(registry.address);
+
+        await saarthi.initialize();
     });
 
 
@@ -217,8 +226,25 @@ describe("Saarthi", accounts => {
             expect(await saarthi.approval(owner.getAddress(), addr1.getAddress())).to.equal(false);
         })
 
-        it("Should update owner of contract", async() => {
-            await saarthi.updateOwner(owner.getAddress());
+        it("Should update Admin of contract", async() => {
+            await saarthi.updateAdmin(owner.getAddress());
+        })
+
+    });
+
+    describe("Upgradability", accounts => {
+
+        it("Should Upgrade the contract saving state.", async() => {
+
+            //Deploy new Logic
+            const Saarthi = await ethers.getContractFactory("Saarthi");
+            const logic = await Saarthi.deploy();
+
+            // Connect new logic
+            await registry.setLogicContract(logic.address);
+
+            // check if version got updated
+            expect(await saarthi.version()).to.equal(2);
         })
 
     });
