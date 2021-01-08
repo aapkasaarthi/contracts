@@ -48,6 +48,62 @@ describe("Saarthi", accounts => {
 
     });
 
+    describe("Decentralized Computation", accounts => {
+
+        it("Should create a new Task", async() => {
+            await saarthi.createTask(
+                getBytes32FromIpfsHash('QmR3VgpgJcGJZX4iazxBcvn2G7jHktLCdozaWF6Hp8DLLH'),
+                3
+            );
+            expect(await saarthi.nextTaskID()).to.equal(2);
+        })
+
+        it("Should update a Task", async() => {
+            await saarthi.createTask(
+                getBytes32FromIpfsHash('QmR3VgpgJcGJZX4iazxBcvn2G7jHktLCdozaWF6Hp8DLLH'),
+                3
+            );
+            expect(await saarthi.nextTaskID()).to.equal(2);
+            await saarthi.updateModelForTask(1, getBytes32FromIpfsHash('QmR3VgpgJcGJZX4iazxBcvn2G7jHktLCdozaWF6Hp8DLLH'), addr1.getAddress());
+        })
+
+    });
+
+    describe("Hospitals", accounts => {
+
+        it("Should enroll hospitals", async() => {
+
+            await saarthi.toggleHospital(addr1.getAddress())
+            expect(await saarthi.hospitals(addr1.getAddress())).to.equal(true);
+
+        })
+
+        it("Should enroll hospitals", async() => {
+
+            await saarthi.toggleHospital(addr1.getAddress())
+            expect(await saarthi.hospitals(addr1.getAddress())).to.equal(true);
+            await saarthi.toggleHospital(addr1.getAddress())
+            expect(await saarthi.hospitals(addr1.getAddress())).to.equal(false);
+
+        })
+
+        it("Should bill user", async() => {
+
+            await saarthi.toggleHospital(addr1.getAddress())
+            expect(await saarthi.hospitals(addr1.getAddress())).to.equal(true);
+            await saarthi.connect(addr1).billUser(
+                addr2.getAddress(),
+                '1000000000000000000'
+            )
+
+            expect(
+                await saarthi.billAmounts(addr2.getAddress())
+            ).to.equal('1000000000000000000');
+
+        })
+
+    });
+
     describe("CrowdFunding", accounts => {
 
         it("Should create Fund1", async() =>{

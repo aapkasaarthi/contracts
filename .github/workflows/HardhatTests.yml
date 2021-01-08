@@ -31,5 +31,5 @@ jobs:
     - name: Run Hardhat Tests
       run: npm run test
 
-    - name: Run Tests Coverage
-      run: npm run test
+    - name: Check Test Coverage
+      run: npm run coverage
