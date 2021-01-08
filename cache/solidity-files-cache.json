@@ -1,15 +1,15 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "C:\\Users\\anudit\\Documents\\GitHub\\saarthi-contracts\\contracts\\Saarthi.sol": {
-      "lastModificationDate": 1610078879365,
-      "contentHash": "750a8dee780822b94d0fe5e844fe939c",
-      "sourceName": "contracts/Saarthi.sol",
+    "C:\\Users\\anudit\\Documents\\GitHub\\saarthi-contracts\\contracts\\SaarthiStorage.sol": {
+      "lastModificationDate": 1610078832048,
+      "contentHash": "e953c42f91dbd0969c736a4e32893373",
+      "sourceName": "contracts/SaarthiStorage.sol",
       "solcConfig": {
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": true,
+            "enabled": false,
             "runs": 999999
           },
           "outputSelection": {
@@ -24,6 +24,46 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.8.0 <0.9.0"
+      ],
+      "artifacts": [
+        "SaarthiStorage"
+      ]
+    },
+    "C:\\Users\\anudit\\Documents\\GitHub\\saarthi-contracts\\contracts\\SaarthiLogic.sol": {
+      "lastModificationDate": 1610080364244,
+      "contentHash": "750a8dee780822b94d0fe5e844fe939c",
+      "sourceName": "contracts/SaarthiLogic.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 999999
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -35,40 +75,6 @@
       ],
       "artifacts": [
         "Saarthi"
-      ]
-    },
-    "C:\\Users\\anudit\\Documents\\GitHub\\saarthi-contracts\\contracts\\SaarthiStorage.sol": {
-      "lastModificationDate": 1610078832048,
-      "contentHash": "e953c42f91dbd0969c736a4e32893373",
-      "sourceName": "contracts/SaarthiStorage.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 999999
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        ">=0.8.0 <0.9.0"
-      ],
-      "artifacts": [
-        "SaarthiStorage"
       ]
     }
   }

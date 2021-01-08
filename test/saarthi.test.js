@@ -217,6 +217,10 @@ describe("Saarthi", accounts => {
             expect(await saarthi.approval(owner.getAddress(), addr1.getAddress())).to.equal(false);
         })
 
+        it("Should update owner of contract", async() => {
+            await saarthi.updateOwner(owner.getAddress());
+        })
+
     });
 });
 
