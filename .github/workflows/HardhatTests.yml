@@ -29,6 +29,9 @@ jobs:
       run: npm i
 
     - name: Run Hardhat Tests
+      env:
+        GITHUB_WORKFLOW: contracts
+        CMC_APIKEY: ${{ secrets.CMC_APIKEY }}
       run: npm run test
 
     - name: Check Test Coverage

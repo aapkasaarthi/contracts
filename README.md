@@ -3,7 +3,7 @@
 ## Overview
 The COVID-19 pandemic has pushed the healthcare system of each country to it’s limit. Massively fragmented healthcare systems in countries like India has been detrimental to controlling the outbreak. This opens up an opportunity to re-organize the system with modern technologies that can cope with the massive requirements of over 1.3 Billion Indians. One of the primary factors that have brought about the current conditions of unequal access of proper healthcare in India are accessibility and affordability. With only 13% of the country speaking English (second to only US) online platforms need to support regional languages to function effectively. People should also be able to support those in need, who are to poor to afford healthcare for themselves. Saarthi helps creating this inclusive and accessible ecosystem. Trust is one of the most crucial factors in building such a multi-dimensional healthcare system. Blockchain plays into this system perfectly as it allows people to verify whether their donations went to the correct person. It allows users to preserve their relationships and data even if the site somehow vanishes as everything is on the blockchain. This helps us build an accessible and accountable healthcare system with inherent verifiability, cutting down the friction and building a socio-economically inclusive healthcare ecosystem.
 
-Saarthi combats these issues with a a multi-dimensional approach towards helping those in need of Financial, Medical or Computational Resources using the RSK Network.
+Saarthi combats these issues with a a multi-dimensional approach towards helping those in need of Financial, Medical or Computational Resources.
 
 ### 1. No Language Barrier
 Saarthi can be utilized to its full capabilities natively in, Hindi, Bengali, Gujarati, Kannada, Malayalam, Punjabi, Marathi, Tamil, Telugu, Urdu, Arabic.
@@ -27,13 +27,14 @@ Saarthi becomes a decentralized and encrypted store for your medical records wit
 Saarthi empowers whistleblowers and enables those who would like to report incidents anonymously, directly to relevant authorities. You can attach a variety of information like location and images with these reports enabling relevant authorities to take appropriate action without revealing your identity.
 
 ### 8. Decentralization.
-Saarthi is completely open source and decentralized at all layers of the stack making it easy to access and censorship-resistant. Saarthi utilizes Textile, RIF and RNS to deploy, store and serve the website. With RSK we utilize their capability to overcome the above concerns with smart contracts expanding the Bitcoin Network. RSK also accounts for scalability, thanks to the capability of processing over 400 transactions per second. Saarthi also pairs up with its RNS Resolver Extension available here to allow anyone to access Saarthi from saarthi.rsk
+Saarthi is completely open source and decentralized at all layers of the stack making it easy to access and censorship-resistant. Saarthi utilizes Textile, RIF, RNS, ENS to deploy, store and serve the website.
 
 ## Running the project
 
 ### Smart Contracts
 1. Run `npm i` to install dependencies.
 1. In the projects root directory, run `npm run compile` to compile the contracts.
+1. In the projects root directory, run `npm run test` to test the contracts.
 
 ## Project Demo
 Website 👉 [https://saarthi.anudit.dev](https://saarthi.anudit.dev)

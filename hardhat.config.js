@@ -51,7 +51,7 @@ module.exports = {
   gasReporter: {
     currency: 'USD',
     gasPrice: 1,
-    coinmarketcap: '54bc5f85-604c-4fc7-83d0-861f37e18427'
+    coinmarketcap: process.env.CMC_APIKEY
   }
 };
 

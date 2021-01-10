@@ -106,3 +106,5 @@ dist
 .secret
 
 note.txt
+artifacts
+cache

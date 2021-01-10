@@ -128,7 +128,7 @@ contract Saarthi is SaarthiStorage {
             campaignEnabled[msg.sender] = true;
             activeCampaignCnt = activeCampaignCnt + 1;
         }
-        emit newCampaign(msg.sender, _campaignData, block.timestamp);
+        emit newCampaign(msg.sender, _campaignData);
     }
 
     /// @notice Donate to a Campaign.
@@ -143,6 +143,7 @@ contract Saarthi is SaarthiStorage {
     function stopCampaign() public notPaused {
         require(campaignEnabled[msg.sender] == true, "User is not Campaigning");
         campaignEnabled[msg.sender] = false;
+        emit campaignStopped(msg.sender);
     }
 
     //------------------------------
@@ -152,14 +153,14 @@ contract Saarthi is SaarthiStorage {
     /// @notice Create a new fund for donation.
     /// @param _orgName Name of Org that owns the fund.
     /// @param _fundName Name of the fund.
-    /// @param _orgAdress address of the Organization.
-    function createFund(bytes32 _orgName, bytes32 _fundName, address payable _orgAdress) public notPaused {
+    /// @param _paymentReceiver address of the Organization.
+    function createFund(bytes32 _orgName, bytes32 _fundName, address payable _paymentReceiver) public notPaused {
 
         uint256 newfundIndex = fundCnt+1;
-        Funds[newfundIndex] = _orgAdress;
+        Funds[newfundIndex] = _paymentReceiver;
         fundCnt = newfundIndex;
 
-        emit newFund(newfundIndex, _orgName, _fundName);
+        emit newFund(newfundIndex, _orgName, _fundName, _paymentReceiver);
     }
 
     /// @notice Donate to a Fund of choice.
@@ -185,9 +186,9 @@ contract Saarthi is SaarthiStorage {
     //------------------------------
 
     /// @notice Create an anonymous report.
-    /// @param _location lcoation of the report.
+    /// @param _location location of the report.
     /// @param _file IPFS hash of the report.
-    /// @param _details AAdditional details about the report.
+    /// @param _details Additional details about the report.
     function fileReport(bytes32 _location, bytes32 _file, string memory _details) public notPaused {
 
         emit newReport(
@@ -201,6 +202,8 @@ contract Saarthi is SaarthiStorage {
         reportCnt = reportCnt + 1;
 
     }
+
+    // TODO: Add function to set status of report.
 
 
 }

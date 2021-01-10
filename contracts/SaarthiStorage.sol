@@ -65,8 +65,9 @@ contract SaarthiStorage {
     uint256 public activeCampaignCnt = 0;
     mapping (address => bool) public campaignEnabled;
 
-    event newCampaign(address indexed _campaigner, bytes32 _campaignData, uint256 _createdAt);
+    event newCampaign(address indexed _campaigner, bytes32 _campaignData);
     event newCampaignDonation(address indexed _campaigner,address indexed _from, uint256 amount);
+    event campaignStopped(address indexed _campaigner);
 
     //------------------------------
     // Crowdfunding
@@ -78,13 +79,14 @@ contract SaarthiStorage {
     mapping (uint256 => address payable) public Funds;
 
     event newFund(
-        uint256 _fundIndex,
+        uint256 indexed _fundIndex,
         bytes32 indexed _orgName,
-        bytes32 _fundName
+        bytes32 _fundName,
+        address indexed _paymentReceiver
     );
 
     event newFundDonation(
-        uint256 _fundIndex,
+        uint256 indexed _fundIndex,
         address indexed _sender,
         address indexed _receiver,
         uint256 _amount
