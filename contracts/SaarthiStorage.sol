@@ -4,7 +4,7 @@
   \__ \/ __ `/ __ `/ ___/ __/ __ \/ /
  ___/ / /_/ / /_/ / /  / /_/ / / / /
 /____/\__,_/\__,_/_/   \__/_/ /_/_/
-       Saarthi Storage Layer
+        Saarthi Storage Layer
 */
 
 // SPDX-License-Identifier: GPL-3.0
@@ -13,7 +13,6 @@ pragma solidity >=0.8.0 <0.9.0;
 
 /// @title Primary Saarthi Storage Contract
 /// @author Anudit Nagar
-/// @dev All function calls are currently implemented.
 contract SaarthiStorage {
 
     uint256 public version = 0;
@@ -49,6 +48,8 @@ contract SaarthiStorage {
 
     mapping (address => bool) public hospitals;
     mapping (address => uint256) public billAmounts;
+    event hospitalUpdated(address indexed _hospital, bool _newState);
+    event newBill(address indexed _hospital, address indexed _billedUser, uint256 _amount);
 
     //------------------------------
     // Acccess Handlers
@@ -108,5 +109,10 @@ contract SaarthiStorage {
         uint256 _time
     );
 
+    event updateReport(
+        address indexed _updater,
+        uint256 indexed _reportIndex,
+        string _action
+    );
 
 }

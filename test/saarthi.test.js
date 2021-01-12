@@ -150,7 +150,10 @@ describe("Saarthi", accounts => {
             );
             expect(await saarthi.fundCnt()).to.equal(1);
 
-            await saarthi.donateToFund(0, {value:ethers.utils.parseEther('1')})
+            expect(await addr2.getBalance()).gte(ethers.utils.parseEther('9999'))
+            await saarthi.connect(addr2).donateToFund(0, {value:ethers.utils.parseEther('1')});
+            expect(await addr2.getBalance()).lte(ethers.utils.parseEther('9999'))
+
             expect(await saarthi.totalDonationCnt()).to.equal(1);
             expect(await saarthi.totalDonationAmount()).to.equal(ethers.utils.parseEther('1'));
         })
@@ -207,6 +210,24 @@ describe("Saarthi", accounts => {
             );
             expect(await saarthi.reportCnt()).to.equal(1);
         })
+
+        it("Should update a report", async() =>{
+
+            await saarthi.fileReport(
+                ethers.utils.formatBytes32String('37.4221 N, 122.0841 W'),
+                getBytes32FromIpfsHash('QmR3VgpgJcGJZX4iazxBcvn2G7jHktLCdozaWF6Hp8DLLH'),
+                'An Anonymous Report filed at GooglePlex.'
+            );
+
+            expect(await saarthi.reportCnt()).to.equal(1);
+
+            await saarthi.connect(addr1).updateReportStatus(
+                '0',
+                'Update about the report'
+            );
+
+        })
+
 
     });
 

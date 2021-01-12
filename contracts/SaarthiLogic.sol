@@ -14,7 +14,6 @@ import './SaarthiStorage.sol';
 
 /// @title Primary Saarthi Contract
 /// @author Anudit Nagar
-/// @dev All function calls are currently implemented.
 contract Saarthi is SaarthiStorage {
 
     function initialize() external {
@@ -73,8 +72,8 @@ contract Saarthi is SaarthiStorage {
     /// @notice Create a new task for decentralized computation.
     /// @param _taskID Id of the task.
     /// @param _modelHash IPFS Hash of the Model.
-    /// @param computer address of the model computer.
-    function updateModelForTask(uint256 _taskID,  bytes32 _modelHash, address payable computer) public notPaused {
+    /// @param _computer address of the model computer.
+    function updateModelForTask(uint256 _taskID,  bytes32 _modelHash, address payable _computer) public notPaused {
         require(msg.sender == coordinatorAddress, "You are not the coordinator !");
         require(_taskID <= nextTaskID, "Invalid Task ID");
         uint256 newRound = SaarthiTasks[_taskID].currentRound + 1;
@@ -82,7 +81,7 @@ contract Saarthi is SaarthiStorage {
 
         SaarthiTasks[_taskID].currentRound = newRound;
         SaarthiTasks[_taskID].modelHashes[newRound - 1] = _modelHash;
-        computer.transfer(SaarthiTasks[_taskID].cost / SaarthiTasks[_taskID].totalRounds);
+        _computer.transfer(SaarthiTasks[_taskID].cost / SaarthiTasks[_taskID].totalRounds);
         emit modelUpdated(_taskID, _modelHash, block.timestamp);
 
     }
@@ -96,6 +95,7 @@ contract Saarthi is SaarthiStorage {
     function toggleHospital(address _address) public notPaused {
         require(msg.sender == admin, "Only Admin");
         hospitals[_address] = !hospitals[_address];
+        emit hospitalUpdated(_address, hospitals[_address]);
     }
 
     /// @notice Bill a user of medical expenses.
@@ -104,6 +104,7 @@ contract Saarthi is SaarthiStorage {
     function billUser(address _user, uint256 _amt) public notPaused {
         require(hospitals[msg.sender] == true, "Unauthorized Hostpital");
         billAmounts[_user] = billAmounts[_user] + _amt;
+        emit newBill(msg.sender, _user, _amt);
     }
 
     //------------------------------
@@ -165,7 +166,7 @@ contract Saarthi is SaarthiStorage {
 
     /// @notice Donate to a Fund of choice.
     /// @param _fundIndex ID of the Fund.
-    function donateToFund(uint256 _fundIndex) public payable notPaused{
+    function donateToFund(uint256 _fundIndex) public payable notPaused {
         require(_fundIndex <= fundCnt, "Invalid Fund ID");
 
         totalDonationAmount = totalDonationAmount + msg.value;
@@ -203,7 +204,17 @@ contract Saarthi is SaarthiStorage {
 
     }
 
-    // TODO: Add function to set status of report.
+    /// @notice Update status of the report
+    /// @param _reportIndex Report index.
+    /// @param _action details about the actions taken.
+    function updateReportStatus(uint256 _reportIndex, string memory _action) public notPaused {
+        require(_reportIndex <= reportCnt, "Invalid Report");
+        emit updateReport(
+            msg.sender,
+            _reportIndex,
+            _action
+        );
 
+    }
 
 }
