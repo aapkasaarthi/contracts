@@ -67,8 +67,8 @@ async function main() {
         ethers.utils.formatBytes32String('Crypto Against COVID'),
         owner.getAddress()
     );
-    await saarthi.connect(addr1).donateToFund(0, {value:ethers.utils.parseEther('0.005')});
-    await saarthi.connect(addr2).donateToFund(0, {value:ethers.utils.parseEther('0.005')});
+    await saarthi.connect(addr1).donateToFund(1, {value:ethers.utils.parseEther('0.005')});
+    await saarthi.connect(addr2).donateToFund(1, {value:ethers.utils.parseEther('0.005')});
 
     console.log('Campaigns')
     await saarthi.connect(owner).startCampaign(

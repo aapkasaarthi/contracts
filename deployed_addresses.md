@@ -1,8 +1,8 @@
 ## Available Networks
 
 ### Ethereum Network - Rinkeby Testnet
-- Proxy deployed to: [0x7a237ae58FD277B909a125C108cF2bDB3821c9e2](https://rinkeby.etherscan.io/address/0x7a237ae58FD277B909a125C108cF2bDB3821c9e2)
-- Implementation deployed to: [0xCd6873Cd79B8F5b2CAD4cE1c7E0C24A2b552dA66](https://rinkeby.etherscan.io/address/0xCd6873Cd79B8F5b2CAD4cE1c7E0C24A2b552dA66)
+- Proxy deployed to: [0x72624c794c508f8d2f3bf65d6b363118d9d6e39e](https://rinkeby.etherscan.io/address/0x72624c794c508f8d2f3bf65d6b363118d9d6e39e)
+- Implementation deployed to: [0xbdcf482aaa378d33b9829bf61e880625bb916fe3](https://rinkeby.etherscan.io/address/0xbdcf482aaa378d33b9829bf61e880625bb916fe3)
 
 ### Matic Network - Mumbai Testnet
 - Proxy deployed to: [0xB7C6dCdCaaD26aC748C4f558386f3107eD2CCF4b](https://mumbai-explorer.matic.today/address/0xB7C6dCdCaaD26aC748C4f558386f3107eD2CCF4b)
